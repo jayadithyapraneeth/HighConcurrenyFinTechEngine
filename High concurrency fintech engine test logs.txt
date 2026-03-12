@@ -1,0 +1,747 @@
+High concurrency fintech engine Baseline concurrency logs - initial stage(without any upgrades and without DBCP) 
+
+[root@ip-172-31-33-76 ~]# ab -n 500 -c 20 "http://13.127.88.222:8080/TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=
+1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Finished 500 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        0 bytes
+
+Concurrency Level:      20
+Time taken for tests:   2.698 seconds
+Complete requests:      500
+Failed requests:        0
+Non-2xx responses:      500
+Total transferred:      116000 bytes
+HTML transferred:       0 bytes
+Requests per second:    185.34 [#/sec] (mean)
+Time per request:       107.913 [ms] (mean)
+Time per request:       5.396 [ms] (mean, across all concurrent requests)
+Transfer rate:          41.99 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.3      0       2
+Processing:    34   91  30.6     88     453
+Waiting:       33   89  29.7     86     412
+Total:         34   91  30.6     88     454
+
+Percentage of the requests served within a certain time (ms)
+  50%     88
+  66%     96
+  75%    103
+  80%    106
+  90%    118
+  95%    135
+  98%    167
+  99%    193
+ 100%    454 (longest request)
+[root@ip-172-31-33-76 ~]# ab -n 500 -c 50 "http://13.127.88.222:8080/TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=
+1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Finished 500 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        0 bytes
+
+Concurrency Level:      50
+Time taken for tests:   1.606 seconds
+Complete requests:      500
+Failed requests:        0
+Non-2xx responses:      500
+Total transferred:      116000 bytes
+HTML transferred:       0 bytes
+Requests per second:    311.37 [#/sec] (mean)
+Time per request:       160.582 [ms] (mean)
+Time per request:       3.212 [ms] (mean, across all concurrent requests)
+Transfer rate:          70.54 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    5   9.0      1      35
+Processing:    16  150  64.7    151     354
+Waiting:       11  140  62.0    142     339
+Total:         21  155  61.7    155     355
+
+Percentage of the requests served within a certain time (ms)
+  50%    155
+  66%    172
+  75%    197
+  80%    205
+  90%    241
+  95%    264
+  98%    281
+  99%    321
+ 100%    355 (longest request)
+[root@ip-172-31-33-76 ~]# ab -n 1000 -c 100 "http://13.127.88.222:8080/TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amoun
+t=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Completed 600 requests
+Completed 700 requests
+Completed 800 requests
+Completed 900 requests
+Completed 1000 requests
+Finished 1000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        0 bytes
+
+Concurrency Level:      100
+Time taken for tests:   2.848 seconds
+Complete requests:      1000
+Failed requests:        0
+Non-2xx responses:      1000
+Total transferred:      232000 bytes
+HTML transferred:       0 bytes
+Requests per second:    351.12 [#/sec] (mean)
+Time per request:       284.803 [ms] (mean)
+Time per request:       2.848 [ms] (mean, across all concurrent requests)
+Transfer rate:          79.55 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    3   5.6      1      33
+Processing:    13  275 105.0    278     604
+Waiting:       10  270 103.0    275     604
+Total:         14  278 105.4    282     611
+
+Percentage of the requests served within a certain time (ms)
+  50%    282
+  66%    310
+  75%    336
+  80%    354
+  90%    416
+  95%    465
+  98%    544
+  99%    572
+ 100%    611 (longest request)
+[root@ip-172-31-33-76 ~]# ab -n 2000 -c 100 "http://13.127.88.222:8080/TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amoun
+t=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 200 requests
+Completed 400 requests
+Completed 600 requests
+Completed 800 requests
+Completed 1000 requests
+Completed 1200 requests
+Completed 1400 requests
+Completed 1600 requests
+Completed 1800 requests
+Completed 2000 requests
+Finished 2000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        0 bytes
+
+Concurrency Level:      100
+Time taken for tests:   4.054 seconds
+Complete requests:      2000
+Failed requests:        0
+Non-2xx responses:      2000
+Total transferred:      464000 bytes
+HTML transferred:       0 bytes
+Requests per second:    493.31 [#/sec] (mean)
+Time per request:       202.712 [ms] (mean)
+Time per request:       2.027 [ms] (mean, across all concurrent requests)
+Transfer rate:          111.77 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0   15  24.7      4     148
+Processing:     7  187  87.8    173     493
+Waiting:        6  177  84.1    167     491
+Total:          8  201  86.4    183     502
+
+Percentage of the requests served within a certain time (ms)
+  50%    183
+  66%    219
+  75%    248
+  80%    274
+  90%    338
+  95%    349
+  98%    401
+  99%    442
+ 100%    502 (longest request)
+[root@ip-172-31-33-76 ~]# ab -n 3000 -c 200 "http://13.127.88.222:8080/TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amoun
+t=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 300 requests
+Completed 600 requests
+Completed 900 requests
+Completed 1200 requests
+Completed 1500 requests
+Completed 1800 requests
+Completed 2100 requests
+apr_pollset_poll: The timeout specified has expired (70007)
+Total of 2143 requests completed
+
+So, the baseline concurrency is at 100-200, with 2000 requests accepted, with a t3.micro EC2 instance type
+99% confidence interval: 442, mean time per request: 202.712 ms
+27-Feb-2026
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+High Concurrency Fintech Engine concurrency logs - with DBCP( DB connections: max limit 50, min limit 20, max idle 5, min idle 2)
+
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 50 -c 10 "http://13.127.88.222:8080/V2_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&
+amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient).....done
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V2_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        0 bytes
+
+Concurrency Level:      10
+Time taken for tests:   0.245 seconds
+Complete requests:      50
+Failed requests:        0
+Non-2xx responses:      50
+Total transferred:      11900 bytes
+HTML transferred:       0 bytes
+Requests per second:    203.92 [#/sec] (mean)
+Time per request:       49.038 [ms] (mean)
+Time per request:       4.904 [ms] (mean, across all concurrent requests)
+Transfer rate:          47.40 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.1      0       1
+Processing:    13   41  30.8     33     154
+Waiting:       13   40  30.6     32     153
+Total:         13   41  30.9     33     155
+
+Percentage of the requests served within a certain time (ms)
+  50%     33
+  66%     38
+  75%     40
+  80%     41
+  90%    100
+  95%    123
+  98%    155
+  99%    155
+ 100%    155 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 500 -c 10 "http://13.127.88.222:8080/V2_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779
+&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Finished 500 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V2_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        0 bytes
+
+Concurrency Level:      10
+Time taken for tests:   1.763 seconds
+Complete requests:      500
+Failed requests:        0
+Non-2xx responses:      500
+Total transferred:      119000 bytes
+HTML transferred:       0 bytes
+Requests per second:    283.68 [#/sec] (mean)
+Time per request:       35.251 [ms] (mean)
+Time per request:       3.525 [ms] (mean, across all concurrent requests)
+Transfer rate:          65.93 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.1      0       1
+Processing:    11   34  24.0     28     194
+Waiting:       11   34  23.9     28     193
+Total:         11   35  24.0     29     194
+
+Percentage of the requests served within a certain time (ms)
+  50%     29
+  66%     34
+  75%     38
+  80%     40
+  90%     50
+  95%     67
+  98%    135
+  99%    154
+ 100%    194 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 500 -c 20 "http://13.127.88.222:8080/V2_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779
+&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Finished 500 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V2_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        0 bytes
+
+Concurrency Level:      20
+Time taken for tests:   1.975 seconds
+Complete requests:      500
+Failed requests:        0
+Non-2xx responses:      500
+Total transferred:      119000 bytes
+HTML transferred:       0 bytes
+Requests per second:    253.22 [#/sec] (mean)
+Time per request:       78.984 [ms] (mean)
+Time per request:       3.949 [ms] (mean, across all concurrent requests)
+Transfer rate:          58.85 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.2      0       3
+Processing:    15   76  67.9     58     404
+Waiting:       15   74  67.6     57     388
+Total:         15   76  68.0     58     404
+
+Percentage of the requests served within a certain time (ms)
+  50%     58
+  66%     65
+  75%     72
+  80%     79
+  90%    140
+  95%    237
+  98%    340
+  99%    378
+ 100%    404 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 500 -c 49 "http://13.127.88.222:8080/V2_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779
+&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Finished 500 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V2_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        0 bytes
+
+Concurrency Level:      49
+Time taken for tests:   3.054 seconds
+Complete requests:      500
+Failed requests:        0
+Non-2xx responses:      500
+Total transferred:      119000 bytes
+HTML transferred:       0 bytes
+Requests per second:    163.70 [#/sec] (mean)
+Time per request:       299.322 [ms] (mean)
+Time per request:       6.109 [ms] (mean, across all concurrent requests)
+Transfer rate:          38.05 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.6      0       3
+Processing:    19  286 151.7    277     836
+Waiting:       17  283 150.2    268     812
+Total:         19  287 151.7    277     836
+
+Percentage of the requests served within a certain time (ms)
+  50%    277
+  66%    352
+  75%    401
+  80%    421
+  90%    499
+  95%    550
+  98%    601
+  99%    637
+ 100%    836 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 500 -c 50 "http://13.127.88.222:8080/V2_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779
+&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Finished 500 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V2_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        0 bytes
+
+Concurrency Level:      50
+Time taken for tests:   2.401 seconds
+Complete requests:      500
+Failed requests:        0
+Non-2xx responses:      500
+Total transferred:      119000 bytes
+HTML transferred:       0 bytes
+Requests per second:    208.27 [#/sec] (mean)
+Time per request:       240.070 [ms] (mean)
+Time per request:       4.801 [ms] (mean, across all concurrent requests)
+Transfer rate:          48.41 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.4      0       2
+Processing:    21  229 163.4    151     772
+Waiting:       19  224 162.2    148     771
+Total:         21  229 163.5    151     772
+
+Percentage of the requests served within a certain time (ms)
+  50%    151
+  66%    267
+  75%    368
+  80%    405
+  90%    480
+  95%    527
+  98%    618
+  99%    696
+ 100%    772 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 1000 -c 50 "http://13.127.88.222:8080/V2_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=112233445555377
+9&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Completed 600 requests
+Completed 700 requests
+Completed 800 requests
+Completed 900 requests
+Completed 1000 requests
+Finished 1000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V2_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        0 bytes
+
+Concurrency Level:      50
+Time taken for tests:   3.999 seconds
+Complete requests:      1000
+Failed requests:        0
+Non-2xx responses:      1000
+Total transferred:      238000 bytes
+HTML transferred:       0 bytes
+Requests per second:    250.04 [#/sec] (mean)
+Time per request:       199.971 [ms] (mean)
+Time per request:       3.999 [ms] (mean, across all concurrent requests)
+Transfer rate:          58.11 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.3      0       3
+Processing:    20  197 119.6    149     775
+Waiting:       18  195 118.9    147     775
+Total:         20  197 119.6    149     776
+
+Percentage of the requests served within a certain time (ms)
+  50%    149
+  66%    184
+  75%    241
+  80%    290
+  90%    385
+  95%    468
+  98%    521
+  99%    562
+ 100%    776 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 1000 -c 100 "http://13.127.88.222:8080/V2_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=11223344555537
+79&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Completed 600 requests
+Completed 700 requests
+Completed 800 requests
+Completed 900 requests
+Completed 1000 requests
+Finished 1000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V2_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        0 bytes
+
+Concurrency Level:      100
+Time taken for tests:   6.073 seconds
+Complete requests:      1000
+Failed requests:        0
+Non-2xx responses:      1000
+Total transferred:      238000 bytes
+HTML transferred:       0 bytes
+Requests per second:    164.65 [#/sec] (mean)
+Time per request:       607.348 [ms] (mean)
+Time per request:       6.073 [ms] (mean, across all concurrent requests)
+Transfer rate:          38.27 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    1   0.9      0       5
+Processing:    18  588 348.2    535    2119
+Waiting:       14  538 339.7    517    2119
+Total:         18  589 348.1    536    2120
+WARNING: The median and mean for the initial connection time are not within a normal deviation
+        These results are probably not that reliable.
+
+Percentage of the requests served within a certain time (ms)
+  50%    536
+  66%    727
+  75%    825
+  80%    882
+  90%   1055
+  95%   1200
+  98%   1444
+  99%   1545
+ 100%   2120 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 2000 -c 100 "http://13.127.88.222:8080/V2_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=11223344555537
+79&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 200 requests
+Completed 400 requests
+Completed 600 requests
+Completed 800 requests
+Completed 1000 requests
+Completed 1200 requests
+Completed 1400 requests
+apr_pollset_poll: The timeout specified has expired (70007)
+Total of 1555 requests completed
+
+
+
+error logs for this test: 
+com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+        at com.mysql.cj.jdbc.exceptions.SQLError.createCommunicationsException(SQLError.java:165)
+        at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:55)
+        at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:845)
+        at com.mysql.cj.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:420)
+        at com.mysql.cj.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:238)
+        at com.mysql.cj.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:180)
+        at org.apache.commons.dbcp2.DriverConnectionFactory.createConnection(DriverConnectionFactory.java:52)
+        at org.apache.commons.dbcp2.PoolableConnectionFactory.makeObject(PoolableConnectionFactory.java:481)
+        at org.apache.commons.pool2.impl.GenericObjectPool.create(GenericObjectPool.java:557)
+        at org.apache.commons.pool2.impl.GenericObjectPool.borrowObject(GenericObjectPool.java:299)
+        at org.apache.commons.pool2.impl.GenericObjectPool.borrowObject(GenericObjectPool.java:231)
+        at org.apache.commons.dbcp2.PoolingDataSource.getConnection(PoolingDataSource.java:138)
+        at org.apache.commons.dbcp2.BasicDataSource.getConnection(BasicDataSource.java:723)
+        at com.servlet.bank.DBCP.getConnection(DBCP.java:31)
+        at com.servlet.bank.PinCredentialVerificationServlet.doGet(PinCredentialVerificationServlet.java:72)
+        at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:564)
+        at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)
+        at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)
+        at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165)
+        at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:88)
+        at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:492)
+        at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113)
+        at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83)
+        at org.apache.catalina.valves.AbstractAccessLogValve.invoke(AbstractAccessLogValve.java:654)
+        at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72)
+        at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:342)
+        at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:399)
+        at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+        at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+        at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1775)
+        at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+        at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:973)
+        at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:491)
+        at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+        at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: com.mysql.cj.exceptions.CJCommunicationsException: Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+        at java.base/jdk.internal.reflect.DirectConstructorHandleAccessor.newInstance(DirectConstructorHandleAccessor.java:62)
+        at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:502)
+        at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+        at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:52)
+        at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:95)
+        at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:140)
+        at com.mysql.cj.exceptions.ExceptionFactory.createCommunicationsException(ExceptionFactory.java:156)
+        at com.mysql.cj.protocol.a.NativeProtocol.negotiateSSLConnection(NativeProtocol.java:367)
+        at com.mysql.cj.protocol.a.NativeAuthenticationProvider.connect(NativeAuthenticationProvider.java:198)
+        at com.mysql.cj.protocol.a.NativeProtocol.connect(NativeProtocol.java:1336)
+        at com.mysql.cj.NativeSession.connect(NativeSession.java:153)
+        at com.mysql.cj.jdbc.ConnectionImpl.connectOneTryOnly(ConnectionImpl.java:969)
+        at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:833)
+        ... 36 more
+Caused by: java.net.SocketException: Broken pipe
+        at java.base/sun.nio.ch.SocketDispatcher.write0(Native Method)
+        at java.base/sun.nio.ch.SocketDispatcher.write(SocketDispatcher.java:62)
+        at java.base/sun.nio.ch.NioSocketImpl.tryWrite(NioSocketImpl.java:394)
+        at java.base/sun.nio.ch.NioSocketImpl.implWrite(NioSocketImpl.java:410)
+        at java.base/sun.nio.ch.NioSocketImpl.write(NioSocketImpl.java:440)
+        at java.base/sun.nio.ch.NioSocketImpl$2.write(NioSocketImpl.java:819)
+        at java.base/java.net.Socket$SocketOutputStream.write(Socket.java:1195)
+        at java.base/sun.security.ssl.SSLSocketOutputRecord.flush(SSLSocketOutputRecord.java:271)
+        at java.base/sun.security.ssl.HandshakeOutStream.flush(HandshakeOutStream.java:89)
+        at java.base/sun.security.ssl.ClientHello$ClientHelloKickstartProducer.produce(ClientHello.java:643)
+        at java.base/sun.security.ssl.SSLHandshake.kickstart(SSLHandshake.java:526)
+        at java.base/sun.security.ssl.ClientHandshakeContext.kickstart(ClientHandshakeContext.java:112)
+        at java.base/sun.security.ssl.TransportContext.kickstart(TransportContext.java:263)
+        at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:448)
+        at java.base/sun.security.ssl.SSLSocketImpl.startHandshake(SSLSocketImpl.java:426)
+        at com.mysql.cj.protocol.ExportControlled.performTlsHandshake(ExportControlled.java:206)
+        at com.mysql.cj.protocol.StandardSocketFactory.performTlsHandshake(StandardSocketFactory.java:183)
+        at com.mysql.cj.protocol.a.NativeSocketConnection.performTlsHandshake(NativeSocketConnection.java:91)
+        at com.mysql.cj.protocol.a.NativeProtocol.negotiateSSLConnection(NativeProtocol.java:358)
+        ... 41 more
+java.lang.NullPointerException: Cannot invoke "java.sql.Connection.prepareStatement(String)" because "conn" is null
+        at com.servlet.bank.PinCredentialVerificationServlet.doGet(PinCredentialVerificationServlet.java:73)
+        at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:564)
+        at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)
+        at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+        at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)
+        at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)
+        at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165)
+        at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:88)
+        at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:492)
+        at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113)
+        at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83)
+        at org.apache.catalina.valves.AbstractAccessLogValve.invoke(AbstractAccessLogValve.java:654)
+        at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72)
+        at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:342)
+        at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:399)
+        at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+        at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
+        at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1775)
+        at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+        at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:973)
+        at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:491)
+        at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+        at java.base/java.lang.Thread.run(Thread.java:1583)
+
+
+Connection Pool Exhaustion discovered. Because the 100/2000 test needed > 50 connections at the same time, that is maximum connection limit and the program requested much more connections, so the OS broke the pipe for Java and MySQL DB. Then the "conn" became null in the program.
+Before entering the Timeout limit (Timeout connection error), the OS itself broke the connection/pipeline.
+
+So, the concurrency is at 50-100, with 1000 requests accepted, with a t3.micro EC2 instance type
+the 100 concurrency is at user/client connection level, but the OS level connections are limited to 50 only
+99% confidence interval: 1545, mean time per request: 607.348 ms
+4th-Mar-2026
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
