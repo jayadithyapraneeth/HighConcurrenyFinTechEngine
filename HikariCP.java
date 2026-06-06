@@ -10,7 +10,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 public class HikariCP {
 	
-private static HikariDataSource commondatasource ;//= new HikariDataSource();// this is the common datwsaource to the whole server
+private static HikariDataSource commondatasource ;// this is the common datwsaource to the whole server
 	
 	static { 
 		
