@@ -1,3 +1,4 @@
+Test-1:
 High concurrency fintech engine Baseline concurrency logs - initial stage(without any upgrades and without DBCP) 
 
 [root@ip-172-31-33-76 ~]# ab -n 500 -c 20 "http://13.127.88.222:8080/TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=
@@ -231,12 +232,14 @@ Completed 2100 requests
 apr_pollset_poll: The timeout specified has expired (70007)
 Total of 2143 requests completed
 
+Result-1:
 So, the baseline concurrency is at 100-200, with 2000 requests accepted, with a t3.micro EC2 instance type
 99% confidence interval: 442, mean time per request: 202.712 ms
 27-Feb-2026
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+Test-2:
 High Concurrency Fintech Engine concurrency logs - with DBCP( DB connections: max limit 50, min limit 20, max idle 5, min idle 2)
 
 [ec2-user@ip-172-31-42-116 ~]$ ab -n 50 -c 10 "http://13.127.88.222:8080/V2_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&
@@ -729,7 +732,7 @@ java.lang.NullPointerException: Cannot invoke "java.sql.Connection.prepareStatem
         at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
         at java.base/java.lang.Thread.run(Thread.java:1583)
 
-
+Result-2:
 Connection Pool Exhaustion discovered. Because the 100/2000 test needed > 50 connections at the same time, that is maximum connection limit and the program requested much more connections, so the OS broke the pipe for Java and MySQL DB. Then the "conn" became null in the program.
 Before entering the Timeout limit (Timeout connection error), the OS itself broke the connection/pipeline.
 
@@ -739,7 +742,7 @@ the 100 concurrency is at user/client connection level, but the OS level connect
 4th-Mar-2026
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
+Test-3:
 High Concurrency Fintech Engine concurrency test logs - with DBCP( DB connections: max limit 50, min limit 20, max idle 5, min idle 2)
 						      - with Background Transaction Ledger(LinkedBlockingQueue) - with local database(not connected to the RDS)
 
@@ -1399,13 +1402,14 @@ Percentage of the requests served within a certain time (ms)
   99%   1120
  100%   1244 (longest request)
 
+Result-3:
 3000*200, 4000*100, 4000*200(test done, but DB transactions not done as the fromaccount have zero balance), 4000*200, 5000*100, 5000*200, 5000*300, 5000*500
 Tests conducted within the range: 500 requests with 50 concurrency - 5000 requests with 500 concurrency
 System does not broke, accepted all the connections and requests
 14th-March-2026 - Local database
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+Test-4:
 High Concurrency Fintech Engine concurrency test logs - with DBCP( DB connections: max limit 50, min limit 20, max idle 5, min idle 2)
 						      - with Background Transaction Ledger(LinkedBlockingQueue) - with RDS database
 
@@ -1955,8 +1959,1306 @@ Percentage of the requests served within a certain time (ms)
   99%   1149
  100%   1163 (longest request)
 
-
+Result-4:
 Tests conducted within the range: 500 requests with 50 concurrency - 5000 requests with 500 concurrency
 System does not broke, accepted all the connections and requests
 14th-March-2026 - RDS database
 -------------------------------------------------------------------------------------------------------------------------------------------------------
+Test-5:
+High Concurrency Fintech Engine concurrency test logs - with DBCP( DB connections: max limit 50, min limit 20, max idle 5, min idle 2)
+						      - with Background Transaction Ledger(RingBuffer) - with local mysql database
+
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 1000 -c 100 "http://13.127.88.222:8080/V4_RB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Completed 600 requests
+Completed 700 requests
+Completed 800 requests
+Completed 900 requests
+Completed 1000 requests
+Finished 1000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V4_RB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        37 bytes
+
+Concurrency Level:      100
+Time taken for tests:   1.119 seconds
+Complete requests:      1000
+Failed requests:        0
+Total transferred:      130000 bytes
+HTML transferred:       37000 bytes
+Requests per second:    893.34 [#/sec] (mean)
+Time per request:       111.939 [ms] (mean)
+Time per request:       1.119 [ms] (mean, across all concurrent requests)
+Transfer rate:          113.41 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    1   2.2      0      18
+Processing:     8  106  35.5    105     221
+Waiting:        3  104  35.5    101     203
+Total:          9  107  35.2    106     221
+
+Percentage of the requests served within a certain time (ms)
+  50%    106
+  66%    123
+  75%    135
+  80%    141
+  90%    154
+  95%    163
+  98%    173
+  99%    187
+ 100%    221 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 3000 -c 100 "http://13.127.88.222:8080/V4_RB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=11223344555
+53779&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 300 requests
+Completed 600 requests
+Completed 900 requests
+Completed 1200 requests
+Completed 1500 requests
+Completed 1800 requests
+Completed 2100 requests
+Completed 2400 requests
+Completed 2700 requests
+Completed 3000 requests
+Finished 3000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V4_RB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        37 bytes
+
+Concurrency Level:      100
+Time taken for tests:   2.114 seconds
+Complete requests:      3000
+Failed requests:        0
+Total transferred:      390000 bytes
+HTML transferred:       111000 bytes
+Requests per second:    1418.88 [#/sec] (mean)
+Time per request:       70.478 [ms] (mean)
+Time per request:       0.705 [ms] (mean, across all concurrent requests)
+Transfer rate:          180.13 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    5   7.3      2      35
+Processing:     4   64  33.0     58     209
+Waiting:        1   58  32.1     53     196
+Total:          4   69  31.0     63     211
+
+Percentage of the requests served within a certain time (ms)
+  50%     63
+  66%     76
+  75%     83
+  80%     90
+  90%    112
+  95%    132
+  98%    150
+  99%    170
+ 100%    211 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 3000 -c 300 "http://13.127.88.222:8080/V4_RB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=11223344555
+53779&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 300 requests
+Completed 600 requests
+Completed 900 requests
+Completed 1200 requests
+Completed 1500 requests
+Completed 1800 requests
+Completed 2100 requests
+Completed 2400 requests
+Completed 2700 requests
+Completed 3000 requests
+Finished 3000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V4_RB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        37 bytes
+
+Concurrency Level:      300
+Time taken for tests:   1.609 seconds
+Complete requests:      3000
+Failed requests:        0
+Total transferred:      390000 bytes
+HTML transferred:       111000 bytes
+Requests per second:    1864.92 [#/sec] (mean)
+Time per request:       160.865 [ms] (mean)
+Time per request:       0.536 [ms] (mean, across all concurrent requests)
+Transfer rate:          236.76 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0   12  19.6      4     109
+Processing:    11  145  69.7    141     394
+Waiting:        3  138  68.1    135     388
+Total:         19  157  62.6    150     408
+
+Percentage of the requests served within a certain time (ms)
+  50%    150
+  66%    182
+  75%    199
+  80%    210
+  90%    241
+  95%    268
+  98%    299
+  99%    322
+ 100%    408 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 4000 -c 300 "http://13.127.88.222:8080/V4_RB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=11223344555
+53779&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 400 requests
+Completed 800 requests
+Completed 1200 requests
+Completed 1600 requests
+Completed 2000 requests
+Completed 2400 requests
+Completed 2800 requests
+Completed 3200 requests
+Completed 3600 requests
+Completed 4000 requests
+Finished 4000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V4_RB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        37 bytes
+
+Concurrency Level:      300
+Time taken for tests:   1.939 seconds
+Complete requests:      4000
+Failed requests:        0
+Total transferred:      520000 bytes
+HTML transferred:       148000 bytes
+Requests per second:    2063.26 [#/sec] (mean)
+Time per request:       145.401 [ms] (mean)
+Time per request:       0.485 [ms] (mean, across all concurrent requests)
+Transfer rate:          261.94 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0   14  32.8      8    1042
+Processing:     3   91  51.9     80     354
+Waiting:        1   83  50.4     74     353
+Total:         14  105  56.2     99    1199
+
+Percentage of the requests served within a certain time (ms)
+  50%     99
+  66%    122
+  75%    134
+  80%    142
+  90%    169
+  95%    190
+  98%    225
+  99%    242
+ 100%   1199 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 5000 -c 500 "http://13.127.88.222:8080/V4_RB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=11223344555
+53779&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 500 requests
+Completed 1000 requests
+Completed 1500 requests
+Completed 2000 requests
+Completed 2500 requests
+Completed 3000 requests
+Completed 3500 requests
+Completed 4000 requests
+Completed 4500 requests
+Completed 5000 requests
+Finished 5000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V4_RB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        37 bytes
+
+Concurrency Level:      500
+Time taken for tests:   2.084 seconds
+Complete requests:      5000
+Failed requests:        0
+Total transferred:      650000 bytes
+HTML transferred:       185000 bytes
+Requests per second:    2399.64 [#/sec] (mean)
+Time per request:       208.364 [ms] (mean)
+Time per request:       0.417 [ms] (mean, across all concurrent requests)
+Transfer rate:          304.64 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0   20  54.3     13    1041
+Processing:     7  146  78.5    133     414
+Waiting:        1  137  78.2    121     408
+Total:         23  166  88.1    149    1202
+
+Percentage of the requests served within a certain time (ms)
+  50%    149
+  66%    179
+  75%    200
+  80%    217
+  90%    273
+  95%    311
+  98%    352
+  99%    375
+ 100%   1202 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 7000 -c 500 "http://13.127.88.222:8080/V4_RB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=11223344555
+53779&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 700 requests
+Completed 1400 requests
+Completed 2100 requests
+Completed 2800 requests
+Completed 3500 requests
+Completed 4200 requests
+Completed 4900 requests
+Completed 5600 requests
+Completed 6300 requests
+Completed 7000 requests
+Finished 7000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V4_RB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        37 bytes
+
+Concurrency Level:      500
+Time taken for tests:   3.078 seconds
+Complete requests:      7000
+Failed requests:        0
+Total transferred:      910000 bytes
+HTML transferred:       259000 bytes
+Requests per second:    2274.55 [#/sec] (mean)
+Time per request:       219.824 [ms] (mean)
+Time per request:       0.440 [ms] (mean, across all concurrent requests)
+Transfer rate:          288.76 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0   36 189.6      0    1077
+Processing:    11  170  89.0    153     564
+Waiting:        1  162  84.5    144     546
+Total:         14  206 206.6    158    1473
+
+Percentage of the requests served within a certain time (ms)
+  50%    158
+  66%    199
+  75%    231
+  80%    255
+  90%    324
+  95%    392
+  98%   1153
+  99%   1265
+ 100%   1473 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 7000 -c 700 "http://13.127.88.222:8080/V4_RB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=11223344555
+53779&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 700 requests
+Completed 1400 requests
+Completed 2100 requests
+Completed 2800 requests
+Completed 3500 requests
+Completed 4200 requests
+Completed 4900 requests
+Completed 5600 requests
+Completed 6300 requests
+Completed 7000 requests
+Finished 7000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V4_RB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        37 bytes
+
+Concurrency Level:      700
+Time taken for tests:   4.689 seconds
+Complete requests:      7000
+Failed requests:        0
+Total transferred:      910000 bytes
+HTML transferred:       259000 bytes
+Requests per second:    1492.90 [#/sec] (mean)
+Time per request:       468.886 [ms] (mean)
+Time per request:       0.670 [ms] (mean, across all concurrent requests)
+Transfer rate:          189.53 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0  131 355.1      0    3141
+Processing:     5  228 454.4    142    3549
+Waiting:        4  224 453.7    137    3547
+Total:          5  358 691.8    152    4596
+
+Percentage of the requests served within a certain time (ms)
+  50%    152
+  66%    199
+  75%    238
+  80%    267
+  90%   1126
+  95%   1496
+  98%   2936
+  99%   4586
+ 100%   4596 (longest request)
+
+
+Result-5:
+Tests conducted within the range: 1000 requests with 100 concurrency - 7000 requests with 700 concurrency
+Average transaction requests received per second: 893.34+1418.88+1864.92+2063.26+2399.64+2274.55+1492.90 = 12407.49 => 12407.49/7 = 1772.49
+System does not broke, accepted all the connections and requests
+5th-April-2026 - Local MySQL database
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+Test-6:
+High Concurrency Fintech Engine concurrency test logs - with DBCP( DB connections: max limit 50, min limit 20, max idle 5, min idle 2)
+						      - with Background Transaction Ledger(RingBuffer) - with Zero Garbage Collection load on JVM - with local mysql database
+
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 5000 -c 500 "http://13.127.88.222:8080/V4_RBZGC_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=112233
+4455553779&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 500 requests
+Completed 1000 requests
+Completed 1500 requests
+Completed 2000 requests
+Completed 2500 requests
+Completed 3000 requests
+Completed 3500 requests
+Completed 4000 requests
+Completed 4500 requests
+Completed 5000 requests
+Finished 5000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V4_RBZGC_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        37 bytes
+
+Concurrency Level:      500
+Time taken for tests:   2.689 seconds
+Complete requests:      5000
+Failed requests:        0
+Total transferred:      650000 bytes
+HTML transferred:       185000 bytes
+Requests per second:    1859.53 [#/sec] (mean)
+Time per request:       268.885 [ms] (mean)
+Time per request:       0.538 [ms] (mean, across all concurrent requests)
+Transfer rate:          236.07 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0   41 198.7      0    1043
+Processing:    12  217  90.4    211     564
+Waiting:        5  216  90.2    209     562
+Total:         26  258 243.9    213    1603
+
+Percentage of the requests served within a certain time (ms)
+  50%    213
+  66%    250
+  75%    277
+  80%    294
+  90%    340
+  95%    422
+  98%   1389
+  99%   1508
+ 100%   1603 (longest request)
+
+Result-6:
+Significant difference from the normal ring buffer version
+10th-April-2026
+-----------------------------------------------------------------------------------------------------------------------------------------
+Test-7:
+High Concurrency Fintech Engine concurrency test logs - with DBCP( DB connections: max limit 50, min limit 20, max idle 5, min idle 2)
+						      - with Background Transaction Ledger(RingBuffer) - with Zero Garbage Collection load on JVM - with local mysql database
+						      - with JDBC Batch processing feature usage(batch capacity = 100, maximum wait time for new transactions = 10 seconds)
+
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 3000 -c 300 "http://13.127.88.222:8080/V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 300 requests
+Completed 600 requests
+Completed 900 requests
+Completed 1200 requests
+Completed 1500 requests
+Completed 1800 requests
+Completed 2100 requests
+Completed 2400 requests
+Completed 2700 requests
+Completed 3000 requests
+Finished 3000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        37 bytes
+
+Concurrency Level:      300
+Time taken for tests:   0.941 seconds
+Complete requests:      3000
+Failed requests:        0
+Total transferred:      390000 bytes
+HTML transferred:       111000 bytes
+Requests per second:    3188.05 [#/sec] (mean)
+Time per request:       94.101 [ms] (mean)
+Time per request:       0.314 [ms] (mean, across all concurrent requests)
+Transfer rate:          404.73 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0   11  12.6      6      56
+Processing:     3   51  43.5     36     256
+Waiting:        1   45  39.4     33     256
+Total:          7   63  41.2     48     262
+
+Percentage of the requests served within a certain time (ms)
+  50%     48
+  66%     61
+  75%     76
+  80%     90
+  90%    114
+  95%    147
+  98%    180
+  99%    239
+ 100%    262 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 5000 -c 500 "http://13.127.88.222:8080/V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=112233445
+5553779&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 500 requests
+Completed 1000 requests
+Completed 1500 requests
+Completed 2000 requests
+Completed 2500 requests
+Completed 3000 requests
+Completed 3500 requests
+Completed 4000 requests
+Completed 4500 requests
+Completed 5000 requests
+Finished 5000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        37 bytes
+
+Concurrency Level:      500
+Time taken for tests:   1.562 seconds
+Complete requests:      5000
+Failed requests:        0
+Total transferred:      650000 bytes
+HTML transferred:       185000 bytes
+Requests per second:    3201.71 [#/sec] (mean)
+Time per request:       156.167 [ms] (mean)
+Time per request:       0.312 [ms] (mean, across all concurrent requests)
+Transfer rate:          406.47 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0   81 241.5     28    1102
+Processing:     7   64  40.9     52     316
+Waiting:        1   53  37.8     42     290
+Total:          7  145 263.7     79    1412
+
+Percentage of the requests served within a certain time (ms)
+  50%     79
+  66%     95
+  75%    101
+  80%    108
+  90%    136
+  95%   1146
+  98%   1235
+  99%   1364
+ 100%   1412 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 7000 -c 700 "http://13.127.88.222:8080/V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=112233445
+5553779&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 700 requests
+Completed 1400 requests
+Completed 2100 requests
+Completed 2800 requests
+Completed 3500 requests
+Completed 4200 requests
+Completed 4900 requests
+Completed 5600 requests
+Completed 6300 requests
+Completed 7000 requests
+Finished 7000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        37 bytes
+
+Concurrency Level:      700
+Time taken for tests:   2.127 seconds
+Complete requests:      7000
+Failed requests:        0
+Total transferred:      910000 bytes
+HTML transferred:       259000 bytes
+Requests per second:    3291.18 [#/sec] (mean)
+Time per request:       212.690 [ms] (mean)
+Time per request:       0.304 [ms] (mean, across all concurrent requests)
+Transfer rate:          417.83 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0  100 259.9     38    1144
+Processing:     7   78  42.2     65     402
+Waiting:        1   63  41.0     49     377
+Total:         15  178 264.2    101    1240
+
+Percentage of the requests served within a certain time (ms)
+  50%    101
+  66%    125
+  75%    140
+  80%    149
+  90%    191
+  95%   1159
+  98%   1211
+  99%   1227
+ 100%   1240 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 10000 -c 1000 "http://13.127.88.222:8080/V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334
+455553779&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 1000 requests
+Completed 2000 requests
+Completed 3000 requests
+Completed 4000 requests
+Completed 5000 requests
+Completed 6000 requests
+Completed 7000 requests
+Completed 8000 requests
+Completed 9000 requests
+Completed 10000 requests
+Finished 10000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        37 bytes
+
+Concurrency Level:      1000
+Time taken for tests:   2.828 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      1300000 bytes
+HTML transferred:       370000 bytes
+Requests per second:    3536.24 [#/sec] (mean)
+Time per request:       282.786 [ms] (mean)
+Time per request:       0.283 [ms] (mean, across all concurrent requests)
+Transfer rate:          448.94 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0  148 330.4     36    1175
+Processing:     5   98  67.4     74     610
+Waiting:        1   82  66.1     59     588
+Total:         11  247 339.1    125    1352
+
+Percentage of the requests served within a certain time (ms)
+  50%    125
+  66%    165
+  75%    191
+  80%    209
+  90%   1102
+  95%   1229
+  98%   1289
+  99%   1321
+ 100%   1352 (longest request)
+
+Result-7:
+Batch processing feature worked well, it improved the range of requests accepted and it reduced the transaction processing latency
+3000/300 in 5 seconds => 600 TPS, 5000/500 in 7 seconds => 714 TPS, 7000/700 in 8 seconds => 875 TPS, 10000/1000 in 10.5 seconds => 952 TPS 
+13th-April-2026
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+Test-8:
+High Concurrency Fintech Engine concurrency test logs - with DBCP( DB connections: max limit 50, min limit 20, max idle 5, min idle 2)
+						      - with Background Transaction Ledger(RingBuffer) - with Zero Garbage Collection load on JVM - with local mysql database
+						      - with JDBC Batch processing feature usage(batch capacity = 100, maximum wait time for new transactions = 10 seconds)
+						      - with updated server configuration (maxThreads = 500 , the default range was 150 which was used for the above tests)
+
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 3000 -c 300 "http://13.127.88.222:8080/V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 300 requests
+Completed 600 requests
+Completed 900 requests
+Completed 1200 requests
+Completed 1500 requests
+Completed 1800 requests
+Completed 2100 requests
+Completed 2400 requests
+Completed 2700 requests
+Completed 3000 requests
+Finished 3000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        37 bytes
+
+Concurrency Level:      300
+Time taken for tests:   1.583 seconds
+Complete requests:      3000
+Failed requests:        0
+Total transferred:      390000 bytes
+HTML transferred:       111000 bytes
+Requests per second:    1895.58 [#/sec] (mean)
+Time per request:       158.263 [ms] (mean)
+Time per request:       0.528 [ms] (mean, across all concurrent requests)
+Transfer rate:          240.65 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0   36  42.1     25    1074
+Processing:     4  113  62.9     96     382
+Waiting:        1  103  61.3     89     368
+Total:         20  150  54.9    148    1172
+
+Percentage of the requests served within a certain time (ms)
+  50%    148
+  66%    159
+  75%    171
+  80%    183
+  90%    216
+  95%    237
+  98%    260
+  99%    274
+ 100%   1172 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 5000 -c 500 "http://13.127.88.222:8080/V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=112233445
+5553779&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 500 requests
+Completed 1000 requests
+Completed 1500 requests
+Completed 2000 requests
+Completed 2500 requests
+Completed 3000 requests
+Completed 3500 requests
+Completed 4000 requests
+Completed 4500 requests
+Completed 5000 requests
+Finished 5000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        37 bytes
+
+Concurrency Level:      500
+Time taken for tests:   1.956 seconds
+Complete requests:      5000
+Failed requests:        0
+Total transferred:      650000 bytes
+HTML transferred:       185000 bytes
+Requests per second:    2555.95 [#/sec] (mean)
+Time per request:       195.622 [ms] (mean)
+Time per request:       0.391 [ms] (mean, across all concurrent requests)
+Transfer rate:          324.49 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0   68 210.5     21    1158
+Processing:     5  108  84.1     75     400
+Waiting:        1   99  82.9     61     398
+Total:         12  176 220.3    104    1208
+
+Percentage of the requests served within a certain time (ms)
+  50%    104
+  66%    162
+  75%    190
+  80%    225
+  90%    291
+  95%    344
+  98%   1181
+  99%   1186
+ 100%   1208 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 7000 -c 700 "http://13.127.88.222:8080/V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 700 requests
+Completed 1400 requests
+Completed 2100 requests
+Completed 2800 requests
+Completed 3500 requests
+Completed 4200 requests
+Completed 4900 requests
+Completed 5600 requests
+Completed 6300 requests
+Completed 7000 requests
+Finished 7000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        37 bytes
+
+Concurrency Level:      700
+Time taken for tests:   1.996 seconds
+Complete requests:      7000
+Failed requests:        0
+Total transferred:      910000 bytes
+HTML transferred:       259000 bytes
+Requests per second:    3506.31 [#/sec] (mean)
+Time per request:       199.640 [ms] (mean)
+Time per request:       0.285 [ms] (mean, across all concurrent requests)
+Transfer rate:          445.14 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0  113 281.4     27    1126
+Processing:     5   59  42.1     47     324
+Waiting:        1   49  39.5     38     306
+Total:         13  172 294.4     83    1234
+
+Percentage of the requests served within a certain time (ms)
+  50%     83
+  66%    118
+  75%    137
+  80%    145
+  90%    185
+  95%   1176
+  98%   1210
+  99%   1219
+ 100%   1234 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 10000 -c 1000 "http://13.127.88.222:8080/V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 1000 requests
+Completed 2000 requests
+Completed 3000 requests
+Completed 4000 requests
+Completed 5000 requests
+Completed 6000 requests
+Completed 7000 requests
+Completed 8000 requests
+Completed 9000 requests
+Completed 10000 requests
+Finished 10000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        37 bytes
+
+Concurrency Level:      1000
+Time taken for tests:   2.740 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      1300000 bytes
+HTML transferred:       370000 bytes
+Requests per second:    3649.69 [#/sec] (mean)
+Time per request:       273.996 [ms] (mean)
+Time per request:       0.274 [ms] (mean, across all concurrent requests)
+Transfer rate:          463.34 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0  116 249.9     57    1176
+Processing:     4   97  47.8     95     414
+Waiting:        2   73  42.6     66     414
+Total:         15  213 257.9    165    1311
+
+Percentage of the requests served within a certain time (ms)
+  50%    165
+  66%    187
+  75%    198
+  80%    202
+  90%    240
+  95%   1222
+  98%   1263
+  99%   1279
+ 100%   1311 (longest request)
+
+Result-8:
+Increase in "maxThreads" range to "500"  improved the performance, it increased the TPS
+3000/300 in 4.8 seconds => 625 TPS, 5000/500 in 5.7 seconds => 877 TPS, 7000/700 in 7.5 seconds => 933 TPS, 10000/1000 in 10 seconds => 1000 TPS
+13th-April-2026
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Test-9:
+High Concurrency Fintech Engine concurrency test logs - with DBCP( DB connections: max limit 50, min limit 20, max idle 5, min idle 2)
+						      - with Background Transaction Ledger(RingBuffer) - with Zero Garbage Collection load on JVM - with local mysql database
+						      - with JDBC Batch processing feature usage(batch capacity = 100, maximum wait time for new transactions = 10 seconds)
+						      - with updated server configuration (maxThreads = 800)
+
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 3000 -c 300 "http://13.127.88.222:8080/V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 300 requests
+Completed 600 requests
+Completed 900 requests
+Completed 1200 requests
+Completed 1500 requests
+Completed 1800 requests
+Completed 2100 requests
+Completed 2400 requests
+Completed 2700 requests
+Completed 3000 requests
+Finished 3000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        37 bytes
+
+Concurrency Level:      300
+Time taken for tests:   1.668 seconds
+Complete requests:      3000
+Failed requests:        0
+Total transferred:      390000 bytes
+HTML transferred:       111000 bytes
+Requests per second:    1798.04 [#/sec] (mean)
+Time per request:       166.849 [ms] (mean)
+Time per request:       0.556 [ms] (mean, across all concurrent requests)
+Transfer rate:          228.27 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0   84 240.3     16    1136
+Processing:     4   78  47.3     64     235
+Waiting:        2   64  44.6     50     231
+Total:          7  162 249.6     95    1227
+
+Percentage of the requests served within a certain time (ms)
+  50%     95
+  66%    129
+  75%    165
+  80%    177
+  90%    222
+  95%   1161
+  98%   1213
+  99%   1220
+ 100%   1227 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 5000 -c 500 "http://13.127.88.222:8080/V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=112233445
+5553779&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 500 requests
+Completed 1000 requests
+Completed 1500 requests
+Completed 2000 requests
+Completed 2500 requests
+Completed 3000 requests
+Completed 3500 requests
+Completed 4000 requests
+Completed 4500 requests
+Completed 5000 requests
+Finished 5000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        37 bytes
+
+Concurrency Level:      500
+Time taken for tests:   1.775 seconds
+Complete requests:      5000
+Failed requests:        0
+Total transferred:      650000 bytes
+HTML transferred:       185000 bytes
+Requests per second:    2817.13 [#/sec] (mean)
+Time per request:       177.485 [ms] (mean)
+Time per request:       0.355 [ms] (mean, across all concurrent requests)
+Transfer rate:          357.64 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0  114 287.2     20    1151
+Processing:    10   56  46.3     30     290
+Waiting:        2   47  40.6     26     282
+Total:         12  170 306.8     56    1368
+
+Percentage of the requests served within a certain time (ms)
+  50%     56
+  66%    123
+  75%    137
+  80%    156
+  90%    197
+  95%   1177
+  98%   1242
+  99%   1247
+ 100%   1368 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 7000 -c 700 "http://13.127.88.222:8080/V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 700 requests
+Completed 1400 requests
+Completed 2100 requests
+Completed 2800 requests
+Completed 3500 requests
+Completed 4200 requests
+Completed 4900 requests
+Completed 5600 requests
+Completed 6300 requests
+Completed 7000 requests
+Finished 7000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        37 bytes
+
+Concurrency Level:      700
+Time taken for tests:   2.126 seconds
+Complete requests:      7000
+Failed requests:        0
+Total transferred:      910000 bytes
+HTML transferred:       259000 bytes
+Requests per second:    3292.59 [#/sec] (mean)
+Time per request:       212.598 [ms] (mean)
+Time per request:       0.304 [ms] (mean, across all concurrent requests)
+Transfer rate:          418.00 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0  104 268.5     31    1105
+Processing:     5   54  45.6     42     470
+Waiting:        2   41  41.7     33     463
+Total:         13  158 283.0     79    1544
+
+Percentage of the requests served within a certain time (ms)
+  50%     79
+  66%     92
+  75%    101
+  80%    108
+  90%    173
+  95%   1095
+  98%   1146
+  99%   1313
+ 100%   1544 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 10000 -c 1000 "http://13.127.88.222:8080/V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 1000 requests
+Completed 2000 requests
+Completed 3000 requests
+Completed 4000 requests
+Completed 5000 requests
+Completed 6000 requests
+Completed 7000 requests
+Completed 8000 requests
+Completed 9000 requests
+Completed 10000 requests
+Finished 10000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V4_RBJB_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        37 bytes
+
+Concurrency Level:      1000
+Time taken for tests:   3.186 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      1300000 bytes
+HTML transferred:       370000 bytes
+Requests per second:    3138.65 [#/sec] (mean)
+Time per request:       318.608 [ms] (mean)
+Time per request:       0.319 [ms] (mean, across all concurrent requests)
+Transfer rate:          398.46 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0   97 245.9     32    1111
+Processing:     1  114 132.3     68    1706
+Waiting:        0   44  59.2     27     558
+Total:          1  211 320.3    123    2730
+
+Percentage of the requests served within a certain time (ms)
+  50%    123
+  66%    209
+  75%    230
+  80%    238
+  90%    289
+  95%   1214
+  98%   1313
+  99%   1374
+ 100%   2730 (longest request)
+
+Result-9:
+Increase in "maxThreads" range to "800"  does not show a significant difference from maxThreads-500 in TPS
+3000/300 in 4.8 seconds => 625 TPS, 5000/500 in 5.3 seconds => 943 TPS, 7000/700 in 7.4 seconds => 945 TPS, 10000/1000 in 11.9 seconds => 840 TPS
+13th-April-2026
+
+comparison between the three batch processing versions(V4_RBJB_TSRBank.war with maxThreads = 150, 500, 800 for versions 1, 2, 3 respectively) tests:
+version-1) 3000/300 in 5 seconds => 600 TPS, 5000/500 in 7 seconds => 714 TPS, 7000/700 in 8 seconds => 875 TPS, 10000/1000 in 10.5 seconds => 952 TPS
+version-2) 3000/300 in 4.8 seconds => 625 TPS, 5000/500 in 5.7 seconds => 877 TPS, 7000/700 in 7.5 seconds => 933 TPS, 10000/1000 in 10 seconds => 1000 TPS
+version-3) 3000/300 in 4.8 seconds => 625 TPS, 5000/500 in 5.3 seconds => 943 TPS, 7000/700 in 7.4 seconds => 945 TPS, 10000/1000 in 11.9 seconds => 840 TPS
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Test-10:
+High Concurrency Fintech Engine concurrency test logs - with DBCP( DB connections: max limit 50, min limit 20, max idle 5, min idle 2)
+						      - with Background Transaction Ledger(RingBuffer) - with Zero Garbage Collection load on JVM - with local mysql database
+						      - with JDBC Batch processing feature usage(batch capacity = 100, maximum wait time for new transactions = 10 seconds)
+						      - with HikariCP as DB connector
+						      - with updated server configuration (maxThreads = 500)
+
+//logs lost
+
+Result-10:
+3000/300 in 7 seconds => 428.5 TPS, 5000/500 in 7 seconds => 714 TPS, 7000/700 in 7.5 seconds => 933 TPS, 10000/800 in 10.3 seconds => 970 TPS, 10000/1000 in 10 seconds => 1000 TPS
+16th-April-2026
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Test-11:
+High Concurrency Fintech Engine concurrency test logs - with DBCP( DB connections: max limit 50, min limit 20, max idle 5, min idle 2)
+						      - with Background Transaction Ledger(RingBuffer) - with Zero Garbage Collection load on JVM - with local mysql database
+						      - with JDBC Batch processing feature usage(batch capacity = 500, maximum wait time for new transactions = 10 seconds)
+						      - with HikariCP as DB connector
+						      - with updated server configuration (maxThreads = 500)
+
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 10000 -c 800 "http://13.127.88.222:8080/V5_HCP_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 1000 requests
+Completed 2000 requests
+Completed 3000 requests
+Completed 4000 requests
+Completed 5000 requests
+Completed 6000 requests
+Completed 7000 requests
+Completed 8000 requests
+Completed 9000 requests
+Completed 10000 requests
+Finished 10000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V5_HCP_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        37 bytes
+
+Concurrency Level:      800
+Time taken for tests:   3.323 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      1300000 bytes
+HTML transferred:       370000 bytes
+Requests per second:    3009.44 [#/sec] (mean)
+Time per request:       265.830 [ms] (mean)
+Time per request:       0.332 [ms] (mean, across all concurrent requests)
+Transfer rate:          382.06 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0  135 298.0     33    1207
+Processing:     8  118  94.5    110     667
+Waiting:        2  102  92.4     85     665
+Total:         14  253 312.5    186    1714
+
+Percentage of the requests served within a certain time (ms)
+  50%    186
+  66%    231
+  75%    250
+  80%    263
+  90%    421
+  95%   1241
+  98%   1267
+  99%   1281
+ 100%   1714 (longest request)
+[ec2-user@ip-172-31-42-116 ~]$ ab -n 10000 -c 1000 "http://13.127.88.222:8080/V5_HCP_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=11223344
+55553779&amount=1&password=0115"
+This is ApacheBench, Version 2.3 <$Revision: 1923142 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 13.127.88.222 (be patient)
+Completed 1000 requests
+Completed 2000 requests
+Completed 3000 requests
+Completed 4000 requests
+Completed 5000 requests
+Completed 6000 requests
+Completed 7000 requests
+Completed 8000 requests
+Completed 9000 requests
+Completed 10000 requests
+Finished 10000 requests
+
+
+Server Software:        
+Server Hostname:        13.127.88.222
+Server Port:            8080
+
+Document Path:          /V5_HCP_TSRBank/pincredentialverificationpage?accountno1=1234567890123456&accountno=1122334455553779&amount=1&password=0115
+Document Length:        37 bytes
+
+Concurrency Level:      1000
+Time taken for tests:   3.097 seconds
+Complete requests:      10000
+Failed requests:        0
+Total transferred:      1300000 bytes
+HTML transferred:       370000 bytes
+Requests per second:    3228.99 [#/sec] (mean)
+Time per request:       309.694 [ms] (mean)
+Time per request:       0.310 [ms] (mean, across all concurrent requests)
+Transfer rate:          409.93 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0  111 274.4     34    1157
+Processing:     9   85  78.5     59     448
+Waiting:        1   71  77.7     41     428
+Total:         12  197 278.1    114    1321
+
+Percentage of the requests served within a certain time (ms)
+  50%    114
+  66%    141
+  75%    160
+  80%    184
+  90%    327
+  95%   1129
+  98%   1179
+  99%   1216
+ 100%   1321 (longest request)
+
+//tests were done messy
+
+Result-11:
+10000/800 in 9.6 seconds and 10000/1000 in 9.7 seconds
+There is a significant increase in transaction processing throughput than batch capacity=100
+the EC2 instance t3.micro crashed/hanged on 20000/1000 test, only 15000 transaction requests accepted, then it stopped taking requests.
+17th-April-2026
+------------------------------------------------------------------------------------------------------------------------------------------------------
