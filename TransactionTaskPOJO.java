@@ -13,7 +13,6 @@ public class TransactionTaskPOJO {
 		System.out.println("TransactionTaskPOJO constructor called-successfully created a transaction task object");
 		this.TransactionId = transactionId;
 		this.ToAccountNumber = toAccountNumber;//this refers to the current class variable or current object attribute
-		//TransactionTaskPOJO.ToAccountNumber = toAccountNumber;// this refers to a class variable or an attribute of a class's bluprint only 
 		this.FromAccountNumber = fromAccountNumber;
 		this.Password = password;
 		this.Amount = amount;
@@ -34,9 +33,6 @@ public class TransactionTaskPOJO {
 	public long getAmount() {
 		return Amount;
 	}
-//	public long getTimeStamp() {
-//		return TimeStamp;
-//	}
 	public long getTransactionID() {
 		return TransactionId;
 	}
