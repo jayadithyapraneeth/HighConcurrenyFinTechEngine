@@ -44,8 +44,6 @@ public class HelperClass {
 				}
 				System.out.println(transaction);
 				nextline = br.readLine();
-//				transaction.delete(0, transaction.length());//to clear the string builder
-//				transaction.append(br.readLine());//to read the next line from the journal
 				transaction.replace(0, transaction.length(), nextline==null?"":nextline);//to clear the string builder and read the next line from the journal
 			}
 			
