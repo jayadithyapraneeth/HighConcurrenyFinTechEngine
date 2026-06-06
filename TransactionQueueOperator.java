@@ -25,7 +25,6 @@ public class TransactionQueueOperator {//this is just a wrapper class for the tr
 	
 	
 	public void addTransactionTask(TransactionTaskPOJO transactiontask) {
-		//transactionqueue.add(transactiontask);
 		transactionqueue.offer(transactiontask);
 		System.out.println("Transaction added");
 	}
@@ -42,7 +41,6 @@ public class TransactionQueueOperator {//this is just a wrapper class for the tr
 			try {
 				t = new TransactionQueueOperator();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
@@ -60,10 +58,8 @@ public class TransactionQueueOperator {//this is just a wrapper class for the tr
 		sb.append(transactionid).append(" - ");
 		if(transactiondetails != null && status.equalsIgnoreCase("pending")) {
 			for(String detail : transactiondetails) {
-				//sb.append("\"").append(detail).append("\"").append(" ");//to add double quotes around each detail and a space between them
 				sb.append(detail).append(",");
 			}
-			//sb.deleteCharAt(sb.length()-1);
 			sb.append(status);
 		}else if(transactiondetails == null && !status.equalsIgnoreCase("pending")){
 			sb.append("null");
@@ -81,10 +77,10 @@ public class TransactionQueueOperator {//this is just a wrapper class for the tr
 		try {
 			String nextline = null;
 			StringBuilder transaction = new StringBuilder(br.readLine());
-			Matcher tidmatch = null;//tid.matcher(transaction);
-			String transactionid = null;//tidmatch.find() ? tidmatch.group().substring(0, tidmatch.group().length()-2) : null;//to extract the transaction id from the transaction log in the journal file
-			Matcher transactiondetailmatch = null;//transactiondetailspattern.matcher(transaction);
-			String transactiondetails[] = null;//transactiondetailmatch.find() ? transactiondetailmatch.group().substring(3, transactiondetailmatch.group().length()-1).split("\"\\s\"") : null;//to extract the transaction details from the transaction log in the journal file and to remove the double quotes and split the details into an array
+			Matcher tidmatch = null;
+			String transactionid = null;
+			Matcher transactiondetailmatch = null;
+			String transactiondetails[] = null;
 			
 			System.out.println("Transaction id : " + transactionid);
 			System.out.println("Transaction details : " + transactiondetails);
@@ -97,7 +93,6 @@ public class TransactionQueueOperator {//this is just a wrapper class for the tr
 				transactionid = tidmatch.find() ? tidmatch.group().substring(0, 16) : null;//we limited the transaction id to 16 digits
 				System.out.println("tid"+transactionid);
 				transactiondetailmatch = transactiondetailspattern.matcher(transaction);
-				//System.out.println("detailmatch"+transactiondetailmatch.group().substring(1));
 				transactiondetails = transactiondetailmatch.find() ? transaction.substring(19).split(",") : null;
 				
 				System.out.println("Transaction ID : "+transactionid);
@@ -105,23 +100,18 @@ public class TransactionQueueOperator {//this is just a wrapper class for the tr
 				
 				if(transactionid!=null && !transactionid.isEmpty()) {
 					if(transactionlogmap.containsKey(transactionid)) {//if we find a transaction log with the same transaction id, then we can remove it from the HashMap immediately as it is already processed and added to the transaction queue by the producer class
-						//lhs.remove(transactionid);
 						transactionlogmap.remove(transactionid);
 					}else {
-						//lhs.add(transactionid);
 						transactionlogmap.put(transactionid, transactiondetails);
 					}
 				}
 				System.out.println(transaction.substring(19));
 				nextline = br.readLine();
-//				transaction.delete(0, transaction.length());//to clear the string builder
-//				transaction.append(br.readLine());//to read the next line from the journal
 				transaction.replace(0, transaction.length(), nextline==null?"":nextline);//to clear the string builder and read the next line from the journal
 			}
 			
 		}catch(NullPointerException npe) {
 			System.out.println(npe.getMessage());
-			//npe.printStackTrace();
 			System.out.println("There are no pending transactions in the journal");
 		}finally {
 			System.out.println("finally block");
