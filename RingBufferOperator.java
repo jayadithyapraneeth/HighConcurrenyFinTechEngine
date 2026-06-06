@@ -32,10 +32,6 @@ public class RingBufferOperator {//this will be a singleton class which will be 
 		return singletoninstance;
 	}
 	
-	/**
-	 * Blocking add: waits until space is available.
-	 * Keeps signature that throws InterruptedException so callers can choose how to handle it.
-	 */
 	public synchronized void addTransactionTask(long accountno2, long accountno1, String password, long amount, long transactionid) throws InterruptedException {
 		
 		
@@ -46,37 +42,12 @@ public class RingBufferOperator {//this will be a singleton class which will be 
 	        wait();
 	    }
 	    
-	    //System.out.println("Adding transaction task to ring buffer at position : " + writeposition);
-	    //System.out.println(ringbuffer[writeposition]);
-	    //System.out.println(ringbuffer[0]);
 	    currentvalue = writeposition.getAndIncrement();
 	    index = currentvalue % capacity;
 	    ringbuffer[index].settermethod(accountno2, accountno1, password, amount, transactionid);
-	    //writeposition = (currentvalue + 1) % capacity;
 	    count++;
 	    notifyAll();
 	}
-	
-	/**
-	 * Blocking take: waits until an element is available.
-	 * This method handles InterruptedException by re-setting the thread's interrupt flag and returning null.
-	 */
-//	public synchronized TransactionTaskPOJO1 takeTransactionTask() {
-//	    while (count == 0) {
-//	        try {
-//	            wait();
-//	        } catch (InterruptedException e) {
-//	            Thread.currentThread().interrupt();
-//	            return null;
-//	        }
-//	    }
-//	    TransactionTaskPOJO1 t = ringbuffer[readposition];
-//	    ringbuffer[readposition] = null; // avoid memory leak
-//	    readposition = (readposition + 1) % capacity;
-//	    count--;
-//	    notifyAll();
-//	    return t;
-//	}
 	
 	public synchronized TransactionTaskPOJO1 takeTransactionTask(long timeoutMs) {
 	    long startTime = System.currentTimeMillis();
@@ -93,7 +64,6 @@ public class RingBufferOperator {//this will be a singleton class which will be 
 	                return null;
 	            }
 	        }
-	        //System.out.println("returning transaction task from ring buffer at position : " + readposition);
 	        return ringbuffer[readposition];
 	    } finally {
 	        if (count > 0) { // Ensure we only update positions if a task was actually taken
@@ -103,18 +73,3 @@ public class RingBufferOperator {//this will be a singleton class which will be 
 	        }
 	    }
 	}
-	
-//	/**
-//	 * Optional non-blocking offer if callers need it.
-//	 */
-//	public synchronized boolean offerTransactionTask(TransactionTaskPOJO transaction) {
-//		if (transaction == null) return false;
-//		if (count == capacity) return false;
-//		ringbuffer[writeposition] = transaction;
-//		writeposition = (writeposition + 1) % capacity;
-//		count++;
-//		notifyAll();
-//		return true;
-//	}
-
-}
