@@ -29,7 +29,6 @@ public class BackgroundLedgerThread implements ServletContextListener {// it is 
 					PreparedStatement batchStmt2 = conn.prepareStatement("INSERT INTO transactionhistory(TransactionType, FromAccountNo, ToAccountNo, Amount, Date) VALUES('TransferMoney', ?, ?, ?, NOW())")) {
 				conn.setAutoCommit(false);
 				long lastFlushTime = System.currentTimeMillis();
-//				int batchSize = 100; // Adjust batch size as needed
 				int batchSize = 500; // Adjust batch size as needed
 				int timeoutMs = 10000; // Flush batch every 10 milli seconds if not full
 				int batchCount = 0;
@@ -125,7 +124,6 @@ public class BackgroundLedgerThread implements ServletContextListener {// it is 
 
 		RingBufferOperator tqo = RingBufferOperator.getInstance();//for money transfer taks only
 		TransactionTaskPOJO1[] pendingtransactiontask = null;
-		// pendingtransactiontask = tqo.checkForPendingTransactionsInJournal();
 
 		if (pendingtransactiontask != null) {
 			for (TransactionTaskPOJO1 transactiontask : pendingtransactiontask) {
@@ -167,104 +165,4 @@ public class BackgroundLedgerThread implements ServletContextListener {// it is 
 		// remove context attribute if present
 		sce.getServletContext().removeAttribute("backgroundWorker");
 	}
-
-	// private static void processTransactionTask(long fromaccountno, long toaccountno,
-	// long amount) throws IOException {
-	// Connection conn = null;
-	// RingBufferOperator ringbufferoperator = RingBufferOperator.getInstance();
-	//
-	// try {
-	// conn = new DBCP().getConnection();
-	// conn.setAutoCommit(false);
-	//
-	// // Combine password check and receiver account validation into one query
-	// PreparedStatement pstmt1 = conn.prepareStatement(
-	// "select c1.Password as SenderPassword, c1.AccountBalance as SenderBalance, c2.AccountNo as ReceiverAccountNo from customerdetails c1, customerdetails c2 where c1.AccountNo = ? and c2.AccountNo = ?;"
-	// );
-	//
-	// pstmt1.setLong(1, transactiontask.getFromAccountNumber()); // Sender account
-	// pstmt1.setLong(2, transactiontask.getToAccountNumber()); // Receiver account
-	// ResultSet rs1 = pstmt1.executeQuery();
-	//
-	// if (rs1.next()) {
-	// String senderpassword = rs1.getString("SenderPassword");
-	// long senderbalance = rs1.getLong("SenderBalance");
-	// boolean receiverexists = rs1.getLong("ReceiverAccount") > 0;
-	//
-	// if (transactiontask.getPassword().equals(senderpassword)) { // Password is correct
-	// if (receiverexists) { // Receiver account exists
-	// if (senderbalance >= transactiontask.getAmount()) { // Sufficient balance
-	//
-	// PreparedStatement pstmt = null;
-	//
-	// pstmt.addBatch("UPDATE customerdetails SET AccountBalance = AccountBalance - "+transactiontask.getAmount()+" WHERE AccountNo = "+transactiontask.getFromAccountNumber());
-	//
-	// // Add debit, credit, and transaction history to batch
-	//// PreparedStatement pstmt2 = conn.prepareStatement("UPDATE customerdetails SET AccountBalance = AccountBalance - ? WHERE AccountNo = ?");
-	//// pstmt2.setLong(1, transactiontask.getAmount());
-	//// pstmt2.setLong(2, transactiontask.getFromAccountNumber());
-	//// pstmt2.addBatch();
-	//
-	//
-	// pstmt.addBatch("UPDATE customerdetails SET AccountBalance = AccountBalance + "+transactiontask.getAmount()+" WHERE AccountNo = "+transactiontask.getToAccountNumber());
-	// //PreparedStatement pstmt3 = conn.prepareStatement("UPDATE customerdetails SET AccountBalance = AccountBalance + ? WHERE AccountNo = ?");
-	//// pstmt2.setLong(1, transactiontask.getAmount());
-	//// pstmt2.setLong(2, transactiontask.getToAccountNumber());
-	//// pstmt2.addBatch();
-	//
-	//
-	// pstmt.addBatch("insert INTO transactionhistory(TransactionType, FromAccountNo, ToAccountNo, Amount, Date) VALUES(TransferMoney, "+transactiontask.getFromAccountNumber()+", "+transactiontask.getToAccountNumber()+", "+transactiontask.getAmount()+", NOW())");
-	//
-	//// PreparedStatement pstmt3 = conn.prepareStatement("INSERT INTO transactionhistory(TransactionType, FromAccountNo, ToAccountNo, Amount, Date) VALUES(?, ?, ?, ?, NOW())");
-	//// pstmt3.setString(1, "TransferMoney");
-	//// pstmt3.setLong(2, transactiontask.getFromAccountNumber());
-	//// pstmt3.setLong(3, transactiontask.getToAccountNumber());
-	//// pstmt3.setLong(4, transactiontask.getAmount());
-	//// pstmt3.addBatch();
-	//
-	// // Execute batch
-	//// pstmt2.executeBatch();
-	//// pstmt3.executeBatch();
-	//// pstmt3.executeBatch();
-	//
-	//
-	// pstmt.addBatch("");
-	//
-	// pstmt.executeBatch();
-	//
-	// conn.commit();
-	// System.out.println("Transaction processed successfully" + count);
-	// count++;
-	// } else {
-	// System.out.println("Insufficient balance in sender account with account number: " + transactiontask.getFromAccountNumber() + " in background ledger thread");
-	// }
-	// } else {
-	// System.out.println("Invalid receiver account number: " + transactiontask.getToAccountNumber() + " in background ledger thread");
-	// }
-	// } else {
-	// System.out.println("Invalid password for sender with account number: " + transactiontask.getFromAccountNumber() + " in background ledger thread");
-	// }
-	// } else {
-	// System.out.println("Sender account not found or invalid receiver account in background ledger thread");
-	// }
-	//
-	// } catch (SQLException sqle) {
-	// System.out.println("SQLException in background ledger thread: " + sqle.getMessage());
-	// try {
-	// if (conn != null) {
-	// conn.rollback();
-	// }
-	// } catch (SQLException e) {
-	// e.printStackTrace();
-	// }
-	// } finally {
-	// if (conn != null) {
-	// try {
-	// conn.close();
-	// } catch (SQLException sqle) {
-	// System.out.println("SQLException while closing connection in background ledger thread: " + sqle.getMessage());
-	// }
-	// }
-	// }
-
 }
